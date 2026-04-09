@@ -3,159 +3,157 @@ import os
 import pandas as pd
 from sqlalchemy.orm import Session
 
-# Ajouter le dossier parent au path pour importer les modules
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from database import SessionLocal, engine
 from models import Base, Spot
 
+
 def parse_coordinate(coord_str):
-    """Parse une coordonnée de format '43° 31.591' N' vers décimal"""
     if not coord_str or pd.isna(coord_str):
         return None
-
     try:
-        # Enlever les espaces
-        coord_str = coord_str.strip()
-
-        # Extraire la direction (N, S, E, W)
+        coord_str = str(coord_str).strip()
         direction = coord_str[-1] if coord_str[-1] in ['N', 'S', 'E', 'W'] else None
-
-        # Enlever la direction
         coord_str = coord_str[:-1].strip()
-
-        # Séparer degrés et minutes
         parts = coord_str.split('°')
         if len(parts) != 2:
             return None
-
         degrees = float(parts[0])
         minutes = float(parts[1].replace("'", "").strip())
-
-        # Convertir en décimal
         decimal = degrees + (minutes / 60.0)
-
-        # Appliquer le signe selon la direction
         if direction in ['S', 'W']:
             decimal = -decimal
-
         return round(decimal, 8)
     except:
         return None
 
-def import_csv_to_db(csv_file_path):
-    """Importer le CSV dans la base de données"""
 
-    # Créer les tables si elles n'existent pas
+def parse_float(value):
+    if value is None or (isinstance(value, float) and pd.isna(value)):
+        return None
+    try:
+        v = str(value).strip()
+        if v.lower() in ('', 'nan', 'unknown', 'none', 'n/a'):
+            return None
+        return float(v)
+    except:
+        return None
+
+
+def parse_int(value):
+    if value is None or (isinstance(value, float) and pd.isna(value)):
+        return None
+    try:
+        return int(float(value))
+    except:
+        return None
+
+
+def parse_str(value):
+    if value is None:
+        return None
+    try:
+        if pd.isna(value):
+            return None
+    except:
+        pass
+    s = str(value).strip()
+    return s if s else None
+
+
+def import_csv_to_db(csv_file_path):
     Base.metadata.create_all(bind=engine)
 
-    # Lire le CSV
     print(f"Lecture du fichier CSV: {csv_file_path}")
-    df = pd.read_csv(csv_file_path)
+    df = pd.read_csv(csv_file_path, dtype=str)
+    print(f"Nombre de spots dans le CSV: {len(df)}")
 
-    print(f"Nombre de spots trouvés: {len(df)}")
-
-    # Créer une session
     db = SessionLocal()
 
     try:
-        # Vider la table spots (attention en production !)
         db.query(Spot).delete()
         db.commit()
         print("Table spots vidée")
 
-        # Mapper les colonnes CSV aux colonnes de la base
-        column_mapping = {
-            'Continent': 'continent',
-            'Country': 'country',
-            'Region': 'region',
-            'Spot': 'name',
-            'Latitude': 'latitude',
-            'Longitude': 'longitude',
-            'Datum': 'datum',
-            'Precision': 'precision',
-            'Access info': 'access_info',
-            'Distance': 'distance',
-            'Walk': 'walk',
-            'Easy to find?': 'easy_to_find',
-            'Public access?': 'public_access',
-            'Special access': 'special_access',
-            'Wave quality': 'wave_quality',
-            'Experience': 'experience',
-            'Frequency': 'frequency',
-            'Type': 'type',
-            'Direction': 'direction',
-            'Bottom': 'bottom',
-            'Power': 'power',
-            'Normal length': 'normal_length',
-            'Good day length': 'good_day_length',
-            'Good swell direction': 'good_swell_direction',
-            'Good wind direction': 'good_wind_direction',
-            'Swell size': 'swell_size',
-            'Best tide position': 'best_tide_position',
-            'Best tide movement': 'best_tide_movement',
-            'Week crowd': 'week_crowd',
-            'Week-end crowd': 'weekend_crowd',
-            'Webcam url': 'webcam_url',
-            'Additional Description': 'description',
-            'Additional Description 2': 'description_2',
-            'Rating': 'rating',
-            'Votes': 'votes'
-        }
-
-        # Insérer chaque ligne
         count = 0
-        for _, row in df.iterrows():
-            spot_data = {}
+        skipped = 0
 
-            for csv_col, db_col in column_mapping.items():
-                value = row.get(csv_col)
+        for idx, row in df.iterrows():
+            try:
+                spot = Spot(
+                    continent=parse_str(row.get('Continent')),
+                    country=parse_str(row.get('Country')),
+                    region=parse_str(row.get('Region')),
+                    name=parse_str(row.get('Spot')),
+                    latitude=parse_coordinate(row.get('Latitude')),
+                    longitude=parse_coordinate(row.get('Longitude')),
+                    datum=parse_str(row.get('Datum')),
+                    precision=parse_str(row.get('Precision')),
+                    access_info=parse_str(row.get('Access info')),
+                    distance=parse_str(row.get('Distance')),
+                    walk=parse_str(row.get('Walk')),
+                    easy_to_find=parse_str(row.get('Easy to find?')),
+                    public_access=parse_str(row.get('Public access?')),
+                    special_access=parse_str(row.get('Special access')),
+                    wave_quality=parse_str(row.get('Wave quality')),
+                    experience=parse_str(row.get('Experience')),
+                    frequency=parse_str(row.get('Frequency')),
+                    type=parse_str(row.get('Type')),
+                    direction=parse_str(row.get('Direction')),
+                    bottom=parse_str(row.get('Bottom')),
+                    power=parse_str(row.get('Power')),
+                    normal_length=parse_str(row.get('Normal length')),
+                    good_day_length=parse_str(row.get('Good day length')),
+                    good_swell_direction=parse_str(row.get('Good swell direction')),
+                    good_wind_direction=parse_str(row.get('Good wind direction')),
+                    swell_size=parse_str(row.get('Swell size')),
+                    best_tide_position=parse_str(row.get('Best tide position')),
+                    best_tide_movement=parse_str(row.get('Best tide movement')),
+                    week_crowd=parse_str(row.get('Week crowd')),
+                    weekend_crowd=parse_str(row.get('Week-end crowd')),
+                    webcam_url=parse_str(row.get('Webcam url')),
+                    description=parse_str(row.get('Additional Description')),
+                    description_2=parse_str(row.get('Additional Description 2')),
+                    rating=parse_int(row.get('Rating')),
+                    votes=parse_int(row.get('Votes')),
+                    frequency_score=parse_float(row.get('Frequency_Score')),
+                    wave_quality_score=parse_float(row.get('Wave_Quality_Score')),
+                    experience_needed_score=parse_float(row.get('Experience_Needed_Score')),
+                    swell_min=parse_float(row.get('swell_min')),
+                    swell_max=parse_float(row.get('swell_max')),
+                )
+                db.add(spot)
+                count += 1
 
-                # Gérer les valeurs vides
-                if pd.isna(value) or value == '':
-                    spot_data[db_col] = None
-                elif db_col == 'latitude':
-                    spot_data[db_col] = parse_coordinate(value)
-                elif db_col == 'longitude':
-                    spot_data[db_col] = parse_coordinate(value)
-                elif db_col in ['rating', 'votes']:
-                    try:
-                        spot_data[db_col] = int(value)
-                    except:
-                        spot_data[db_col] = None
-                else:
-                    spot_data[db_col] = str(value)
+                if count % 200 == 0:
+                    db.commit()
+                    print(f"{count} spots importés...")
 
-            # Créer le spot
-            spot = Spot(**spot_data)
-            db.add(spot)
-            count += 1
+            except Exception as e:
+                skipped += 1
+                print(f"  Ligne {idx} ignorée: {e}")
+                db.rollback()
 
-            # Commit tous les 100 spots
-            if count % 100 == 0:
-                db.commit()
-                print(f"{count} spots importés...")
-
-        # Commit final
         db.commit()
-        print(f"\n✅ Import terminé ! {count} spots importés avec succès.")
+        print(f"\n✅ Import terminé ! {count} spots importés, {skipped} ignorés.")
 
     except Exception as e:
         db.rollback()
-        print(f"\n❌ Erreur lors de l'import: {str(e)}")
+        print(f"\n❌ Erreur fatale: {e}")
         raise
     finally:
         db.close()
 
+
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python import_csv.py <chemin_vers_fichier.csv>")
+        print("Usage: python import_csv.py <fichier.csv>")
         sys.exit(1)
 
     csv_path = sys.argv[1]
-
     if not os.path.exists(csv_path):
-        print(f"Erreur: Le fichier {csv_path} n'existe pas")
+        print(f"Erreur: {csv_path} introuvable")
         sys.exit(1)
 
     import_csv_to_db(csv_path)
