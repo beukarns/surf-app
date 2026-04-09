@@ -86,6 +86,28 @@ export const sessionsAPI = {
   getSpotSessions: (spotId) => api.get(`/sessions/${spotId}`),
 };
 
+// Media
+export const mediaAPI = {
+  getSpotMedia: (spotId) => api.get(`/media/${spotId}`),
+  uploadFile: (spotId, file, title) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (title) formData.append('title', title);
+    return api.post(`/media/${spotId}/upload`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
+  addYoutube: (spotId, youtubeUrl, title) => {
+    const formData = new FormData();
+    formData.append('youtube_url', youtubeUrl);
+    if (title) formData.append('title', title);
+    return api.post(`/media/${spotId}/youtube`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
+  deleteMedia: (mediaId) => api.delete(`/media/${mediaId}`),
+};
+
 // Favorites
 export const favoritesAPI = {
   getMyFavorites: () => api.get('/favorites'),

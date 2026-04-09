@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Home from './pages/Home';
 import Continents from './pages/Continents';
 import Countries from './pages/Countries';
 import Regions from './pages/Regions';
@@ -19,7 +20,7 @@ function ProtectedRoute({ children }) {
 function PublicRoute({ children }) {
   const { user, loading } = useAuth();
   if (loading) return <div className="loading">Chargement...</div>;
-  if (user) return <Navigate to="/continents" replace />;
+  if (user) return <Navigate to="/" replace />;
   return children;
 }
 
@@ -31,6 +32,7 @@ function AppRoutes() {
       <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
 
       {/* Routes protégées */}
+      <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
       <Route path="/continents" element={<ProtectedRoute><Continents /></ProtectedRoute>} />
       <Route path="/countries/:continent" element={<ProtectedRoute><Countries /></ProtectedRoute>} />
       <Route path="/regions/:continent/:country" element={<ProtectedRoute><Regions /></ProtectedRoute>} />
@@ -38,11 +40,8 @@ function AppRoutes() {
       <Route path="/spot/:spotId" element={<ProtectedRoute><SpotDetail /></ProtectedRoute>} />
       <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
 
-      {/* Redirect racine */}
-      <Route path="/" element={<Navigate to="/continents" replace />} />
-
       {/* 404 */}
-      <Route path="*" element={<Navigate to="/continents" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

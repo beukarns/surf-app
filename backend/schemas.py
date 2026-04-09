@@ -165,3 +165,16 @@ class SpotRatingStats(BaseModel):
     average_rating: float
     total_votes: int
     user_rating: Optional[int] = None
+
+class SpotMediaResponse(BaseModel):
+    id: int
+    spot_id: int
+    user_id: int
+    media_type: str
+    url: str
+    title: Optional[str] = None
+    created_at: datetime
+    user_email: Optional[str] = None
+
+    class Config:
+        from_attributes = True

@@ -43,7 +43,7 @@ function Profile() {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <button onClick={() => navigate('/continents')} className="btn-ghost">← Retour</button>
+          <button onClick={() => navigate('/')} className="btn-ghost">← Retour</button>
           <span style={{ color: 'white', fontWeight: 600, fontSize: '20px' }}>Mon profil</span>
         </div>
         <button onClick={handleLogout} className="btn-danger">Déconnexion</button>

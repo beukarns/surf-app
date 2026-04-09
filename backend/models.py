@@ -110,6 +110,21 @@ class Favorite(Base):
     user = relationship("User", back_populates="favorites")
     spot = relationship("Spot", back_populates="favorites")
 
+class SpotMedia(Base):
+    __tablename__ = "spot_media"
+
+    id = Column(Integer, primary_key=True, index=True)
+    spot_id = Column(Integer, ForeignKey("spots.id"), nullable=False, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    media_type = Column(String(20), nullable=False)  # 'photo', 'video', 'youtube'
+    url = Column(String(500), nullable=False)         # chemin fichier ou URL YouTube
+    title = Column(String(200))
+    created_at = Column(TIMESTAMP, server_default=func.now())
+
+    user = relationship("User")
+    spot = relationship("Spot")
+
+
 class ProposedSpot(Base):
     __tablename__ = "proposed_spots"
 

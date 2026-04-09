@@ -1,8 +1,10 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from database import engine, Base
 from config import settings
-from routers import auth, spots, proposed_spots, ratings, sessions, favorites
+from routers import auth, spots, proposed_spots, ratings, sessions, favorites, media
 
 Base.metadata.create_all(bind=engine)
 
@@ -26,6 +28,12 @@ app.include_router(proposed_spots.router)
 app.include_router(ratings.router)
 app.include_router(sessions.router)
 app.include_router(favorites.router)
+app.include_router(media.router)
+
+# Servir les fichiers uploadés
+UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "uploads")
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 
 @app.get("/")
