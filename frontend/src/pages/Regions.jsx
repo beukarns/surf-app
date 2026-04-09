@@ -29,10 +29,10 @@ function Regions() {
     try {
       const response = await spotsAPI.getSpotsByCountry(continent, country);
       setSpots(response.data);
-      // Ouvrir toutes les régions par défaut si peu nombreuses
+      // Tout fermé par défaut
       const regions = [...new Set(response.data.map(s => s.region))];
       const initial = {};
-      regions.forEach((r, i) => { initial[r] = i < 5; }); // ouvrir les 5 premières
+      regions.forEach(r => { initial[r] = false; });
       setOpenRegions(initial);
     } catch (err) {
       setError('Erreur lors du chargement des spots');

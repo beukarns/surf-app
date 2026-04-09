@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { spotsAPI, ratingsAPI, sessionsAPI, favoritesAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Tooltip } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -19,6 +19,27 @@ let DefaultIcon = L.icon({
 });
 
 L.Marker.prototype.options.icon = DefaultIcon;
+
+const QUALITY_COLORS = {
+  'World Class': '#8b5cf6',
+  'Totally Epic': '#8b5cf6',
+  'Regional Classic': '#10b981',
+  'Normal': '#f59e0b',
+  'Sloppy': '#fb923c',
+  'Choss': '#ef4444',
+};
+
+const makeMarkerIcon = (color, size = 26) => L.divIcon({
+  className: 'custom-marker-icon',
+  html: `<svg width="${size}" height="${Math.round(size * 1.4)}" viewBox="0 0 30 42" xmlns="http://www.w3.org/2000/svg">
+    <path d="M15 0C6.716 0 0 6.716 0 15c0 11.25 15 27 15 27s15-15.75 15-27C30 6.716 23.284 0 15 0z"
+          fill="${color}" stroke="#ffffff" stroke-width="2"/>
+    <circle cx="15" cy="15" r="5" fill="#ffffff"/>
+  </svg>`,
+  iconSize: [size, Math.round(size * 1.4)],
+  iconAnchor: [size / 2, Math.round(size * 1.4)],
+  popupAnchor: [0, -Math.round(size * 1.4)]
+});
 
 function SpotDetail() {
   const [spot, setSpot] = useState(null);
@@ -41,6 +62,7 @@ function SpotDetail() {
     notes: ''
   });
   const [sessionSuccess, setSessionSuccess] = useState(false);
+  const [regionSpots, setRegionSpots] = useState([]);
   const navigate = useNavigate();
   const { spotId } = useParams();
   const { user } = useAuth();
@@ -54,7 +76,14 @@ function SpotDetail() {
   const loadSpot = async () => {
     try {
       const response = await spotsAPI.getSpotDetail(spotId);
-      setSpot(response.data);
+      const s = response.data;
+      setSpot(s);
+      // Charger les autres spots de la même région
+      if (s.continent && s.country && s.region) {
+        spotsAPI.getSpotsByRegion(s.continent, s.country, s.region)
+          .then(r => setRegionSpots(r.data.filter(rs => rs.id !== s.id)))
+          .catch(() => {});
+      }
     } catch (err) {
       setError('Erreur lors du chargement du spot');
     } finally {
@@ -232,9 +261,28 @@ function SpotDetail() {
       <div className="card">
         {/* Titre */}
         <div style={{ marginBottom: '24px' }}>
-          <h1 style={{ marginBottom: '6px', marginTop: 0 }}>{spot.name || spot.region}</h1>
-          <div style={{ color: '#8a9bb0', fontSize: '15px' }}>
-            {[spot.continent, spot.country, spot.region].filter(Boolean).join(' › ')}
+          <h1 style={{ marginBottom: '8px', marginTop: 0 }}>{spot.name || spot.region}</h1>
+          <div style={{ display: 'flex', gap: '4px', alignItems: 'center', flexWrap: 'wrap' }}>
+            <span
+              onClick={() => navigate(`/countries/${encodeURIComponent(spot.continent)}`)}
+              style={{ color: '#00b4d8', fontSize: '14px', cursor: 'pointer', fontWeight: 600 }}
+              onMouseEnter={e => e.target.style.textDecoration = 'underline'}
+              onMouseLeave={e => e.target.style.textDecoration = 'none'}
+            >{spot.continent}</span>
+            <span style={{ color: '#c8dff0' }}>›</span>
+            <span
+              onClick={() => navigate(`/regions/${encodeURIComponent(spot.continent)}/${encodeURIComponent(spot.country)}`)}
+              style={{ color: '#00b4d8', fontSize: '14px', cursor: 'pointer', fontWeight: 600 }}
+              onMouseEnter={e => e.target.style.textDecoration = 'underline'}
+              onMouseLeave={e => e.target.style.textDecoration = 'none'}
+            >{spot.country}</span>
+            <span style={{ color: '#c8dff0' }}>›</span>
+            <span
+              onClick={() => navigate(`/spots/${encodeURIComponent(spot.continent)}/${encodeURIComponent(spot.country)}/${encodeURIComponent(spot.region)}`)}
+              style={{ color: '#00b4d8', fontSize: '14px', cursor: 'pointer', fontWeight: 600 }}
+              onMouseEnter={e => e.target.style.textDecoration = 'underline'}
+              onMouseLeave={e => e.target.style.textDecoration = 'none'}
+            >{spot.region}</span>
           </div>
         </div>
 
@@ -261,9 +309,37 @@ function SpotDetail() {
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 />
-                <Marker position={[parseFloat(spot.latitude), parseFloat(spot.longitude)]}>
-                  <Popup><strong>{spot.name || spot.region}</strong></Popup>
+                {/* Spot actuel — marker bleu mis en avant */}
+                <Marker
+                  position={[parseFloat(spot.latitude), parseFloat(spot.longitude)]}
+                  icon={makeMarkerIcon('#0077b6', 34)}
+                  zIndexOffset={1000}
+                >
+                  <Popup><strong>{spot.name || spot.region}</strong><br/><span style={{fontSize:'12px',color:'#666'}}>Spot actuel</span></Popup>
                 </Marker>
+                {/* Autres spots de la même région */}
+                {regionSpots.filter(rs => rs.latitude && rs.longitude).map(rs => (
+                  <Marker
+                    key={rs.id}
+                    position={[parseFloat(rs.latitude), parseFloat(rs.longitude)]}
+                    icon={makeMarkerIcon(QUALITY_COLORS[rs.wave_quality] || '#9ca3af', 24)}
+                  >
+                    <Tooltip direction="top" offset={[0, -28]} opacity={0.9}>
+                      <strong>{rs.name || rs.region}</strong>
+                      {rs.wave_quality && <span> — {rs.wave_quality}</span>}
+                    </Tooltip>
+                    <Popup>
+                      <strong>{rs.name || rs.region}</strong>
+                      {rs.wave_quality && <div style={{fontSize:'12px',marginTop:'4px'}}>{rs.wave_quality}</div>}
+                      <button
+                        onClick={() => navigate(`/spot/${rs.id}`)}
+                        style={{marginTop:'8px',padding:'5px 10px',background:'#00b4d8',color:'white',border:'none',borderRadius:'6px',cursor:'pointer',fontSize:'12px',width:'100%'}}
+                      >
+                        Voir ce spot →
+                      </button>
+                    </Popup>
+                  </Marker>
+                ))}
               </MapContainer>
             </div>
 
