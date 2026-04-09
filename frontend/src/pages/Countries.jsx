@@ -34,22 +34,26 @@ function Countries() {
 
   return (
     <div className="container">
-      <div className="card">
-        <button onClick={() => navigate('/continents')} className="back-button">
-          ← Retour aux continents
-        </button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+        <button onClick={() => navigate('/continents')} className="btn-ghost">← Retour</button>
+        <span style={{ color: 'white', fontWeight: 600, fontSize: '18px' }}>{continent}</span>
+      </div>
 
-        <h1>Choisissez un pays - {continent}</h1>
+      <div className="card">
+        <h1 style={{ marginTop: 0, marginBottom: '6px' }}>Choisissez un pays</h1>
+        <p style={{ color: '#8a9bb0', fontSize: '14px', marginBottom: '24px', marginTop: 0 }}>
+          {countries.length} pays disponibles en {continent}
+        </p>
 
         {error && <div className="error">{error}</div>}
 
         {/* Carte du continent zoomée */}
         <div style={{
-          background: '#e0f7fa',
-          borderRadius: '12px',
+          background: 'linear-gradient(135deg, #e0f7fa, #b2ebf2)',
+          borderRadius: '16px',
           padding: '20px',
-          marginBottom: '30px',
-          boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+          marginBottom: '28px',
+          boxShadow: '0 4px 16px rgba(0,180,216,0.15)'
         }}>
           <ContinentMap
             continent={continent}
@@ -58,10 +62,9 @@ function Countries() {
           />
         </div>
 
-        {/* Liste alternative */}
-        <h2 style={{ fontSize: '18px', marginBottom: '15px', color: '#666' }}>
-          Ou choisissez dans la liste :
-        </h2>
+        <p style={{ fontSize: '13px', color: '#8a9bb0', marginBottom: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+          Ou choisissez dans la liste
+        </p>
         <ul className="list">
           {countries.map((country) => (
             <li
@@ -69,7 +72,8 @@ function Countries() {
               className="list-item"
               onClick={() => handleCountryClick(country)}
             >
-              {country}
+              <span style={{ fontWeight: 600, color: '#0e4d6e' }}>{country}</span>
+              <span style={{ color: '#8a9bb0', fontSize: '18px' }}>›</span>
             </li>
           ))}
         </ul>

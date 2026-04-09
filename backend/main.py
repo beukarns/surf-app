@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import engine, Base
 from config import settings
-from routers import auth, spots, proposed_spots, ratings, sessions
+from routers import auth, spots, proposed_spots, ratings, sessions, favorites
 
 Base.metadata.create_all(bind=engine)
 
@@ -25,6 +25,7 @@ app.include_router(spots.router)
 app.include_router(proposed_spots.router)
 app.include_router(ratings.router)
 app.include_router(sessions.router)
+app.include_router(favorites.router)
 
 
 @app.get("/")

@@ -29,13 +29,22 @@ function Login() {
   };
 
   return (
-    <div className="container" style={{ maxWidth: '420px' }}>
+    <div style={{ width: '100%', maxWidth: '420px', margin: '40px auto' }}>
+      {/* Header */}
+      <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+        <div style={{ fontSize: '52px', marginBottom: '8px' }}>🏄</div>
+        <h1 style={{ color: 'white', fontFamily: 'Poppins, sans-serif', fontSize: '32px', fontWeight: 800, marginBottom: '6px' }}>
+          Surf Spots
+        </h1>
+        <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '15px' }}>
+          Les meilleurs spots du monde
+        </p>
+      </div>
+
       <div className="card">
-        <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-          <div style={{ fontSize: '48px', marginBottom: '10px' }}>🏄</div>
-          <h1 style={{ margin: 0 }}>Surf Spots</h1>
-          <p style={{ color: '#666', marginTop: '8px' }}>Connectez-vous pour accéder aux spots</p>
-        </div>
+        <h2 style={{ textAlign: 'center', marginBottom: '24px', color: '#0e4d6e' }}>
+          Connexion
+        </h2>
 
         {error && <div className="error">{error}</div>}
 
@@ -66,14 +75,14 @@ function Login() {
             />
           </div>
 
-          <button type="submit" disabled={loading} style={{ marginTop: '10px' }}>
-            {loading ? 'Connexion...' : 'Se connecter'}
+          <button type="submit" className="btn-primary" disabled={loading} style={{ marginTop: '8px' }}>
+            {loading ? 'Connexion...' : 'Se connecter 🌊'}
           </button>
         </form>
 
-        <p style={{ textAlign: 'center', marginTop: '20px', color: '#666', fontSize: '14px' }}>
+        <p style={{ textAlign: 'center', marginTop: '20px', color: '#4a6580', fontSize: '14px' }}>
           Pas encore de compte ?{' '}
-          <Link to="/register" style={{ color: '#667eea', fontWeight: 'bold', textDecoration: 'none' }}>
+          <Link to="/register" style={{ color: '#00b4d8', fontWeight: 600, textDecoration: 'none' }}>
             Créer un compte
           </Link>
         </p>

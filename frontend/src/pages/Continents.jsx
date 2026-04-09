@@ -42,42 +42,39 @@ function Continents() {
 
   return (
     <div className="container">
-      <div className="card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <h1 style={{ margin: 0 }}>Choisissez un continent</h1>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <button
-              onClick={() => navigate('/search')}
-              style={{
-                padding: '8px 16px',
-                background: '#3b82f6',
-                color: 'white',
-                border: 'none',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: 'bold',
-                width: 'auto'
-              }}
-            >
-              Rechercher un spot
-            </button>
-            <span style={{ fontSize: '14px', color: '#666' }}>{user?.email}</span>
-            <button onClick={handleLogout} className="back-button" style={{ margin: 0 }}>
-              Déconnexion
-            </button>
-          </div>
+      {/* Navbar */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
+        <div style={{ color: 'white', fontWeight: 700, fontSize: '22px', letterSpacing: '-0.5px' }}>
+          🏄 SurfSpots
         </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          <button onClick={() => navigate('/search')} className="btn-secondary" style={{ fontSize: '14px' }}>
+            🔍 Rechercher
+          </button>
+          <button onClick={() => navigate('/profile')} className="btn-ghost" style={{ fontSize: '14px' }}>
+            👤 {user?.email?.split('@')[0]}
+          </button>
+          <button onClick={handleLogout} className="btn-danger" style={{ fontSize: '14px' }}>
+            Déconnexion
+          </button>
+        </div>
+      </div>
+
+      <div className="card">
+        <h1 style={{ marginTop: 0, marginBottom: '6px' }}>Choisissez un continent</h1>
+        <p style={{ color: '#8a9bb0', fontSize: '14px', marginBottom: '24px', marginTop: 0 }}>
+          {continents.length} continents disponibles
+        </p>
 
         {error && <div className="error">{error}</div>}
 
         {/* Carte du monde interactive */}
         <div style={{
-          background: '#e0f7fa',
-          borderRadius: '12px',
+          background: 'linear-gradient(135deg, #e0f7fa, #b2ebf2)',
+          borderRadius: '16px',
           padding: '20px',
-          marginBottom: '30px',
-          boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+          marginBottom: '28px',
+          boxShadow: '0 4px 16px rgba(0,180,216,0.15)',
           position: 'relative'
         }}>
           <WorldMap
@@ -90,13 +87,13 @@ function Continents() {
           {hoveredContinent && continents.includes(hoveredContinent) && (
             <div style={{
               textAlign: 'center',
-              color: '#1e40af',
-              fontSize: '20px',
-              fontWeight: 'bold',
-              marginTop: '15px',
+              color: '#0077b6',
+              fontSize: '18px',
+              fontWeight: 700,
+              marginTop: '12px',
               padding: '10px',
               background: 'rgba(255,255,255,0.9)',
-              borderRadius: '8px',
+              borderRadius: '10px',
               pointerEvents: 'none'
             }}>
               {hoveredContinent}
@@ -105,17 +102,18 @@ function Continents() {
         </div>
 
         {/* Liste alternative */}
-        <h2 style={{ fontSize: '18px', marginBottom: '15px', color: '#666' }}>
-          Ou choisissez dans la liste :
-        </h2>
+        <p style={{ fontSize: '13px', color: '#8a9bb0', marginBottom: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+          Ou choisissez dans la liste
+        </p>
         <ul className="list">
-          {continents.map((continent) => (
+          {continents.map((c) => (
             <li
-              key={continent}
+              key={c}
               className="list-item"
-              onClick={() => navigate(`/countries/${encodeURIComponent(continent)}`)}
+              onClick={() => navigate(`/countries/${encodeURIComponent(c)}`)}
             >
-              {continent}
+              <span style={{ fontWeight: 600, color: '#0e4d6e' }}>{c}</span>
+              <span style={{ color: '#8a9bb0', fontSize: '18px' }}>›</span>
             </li>
           ))}
         </ul>

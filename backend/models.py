@@ -14,6 +14,7 @@ class User(Base):
     # Relations
     sessions = relationship("Session", back_populates="user")
     alerts = relationship("Alert", back_populates="user")
+    favorites = relationship("Favorite", back_populates="user")
 
 class Spot(Base):
     __tablename__ = "spots"
@@ -63,6 +64,7 @@ class Spot(Base):
 
     # Relations
     sessions = relationship("Session", back_populates="spot")
+    favorites = relationship("Favorite", back_populates="spot")
 
 class Session(Base):
     __tablename__ = "sessions"
@@ -96,6 +98,17 @@ class Alert(Base):
 
     # Relations
     user = relationship("User", back_populates="alerts")
+
+class Favorite(Base):
+    __tablename__ = "favorites"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    spot_id = Column(Integer, ForeignKey("spots.id"), nullable=False, index=True)
+    created_at = Column(TIMESTAMP, server_default=func.now())
+
+    user = relationship("User", back_populates="favorites")
+    spot = relationship("Spot", back_populates="favorites")
 
 class ProposedSpot(Base):
     __tablename__ = "proposed_spots"

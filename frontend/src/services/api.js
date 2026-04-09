@@ -55,6 +55,8 @@ export const spotsAPI = {
     api.get(`/spots/countries/${encodeURIComponent(continent)}`),
   getRegions: (continent, country) =>
     api.get(`/spots/regions/${encodeURIComponent(continent)}/${encodeURIComponent(country)}`),
+  getSpotsByCountry: (continent, country) =>
+    api.get(`/spots/country/${encodeURIComponent(continent)}/${encodeURIComponent(country)}`),
   getSpotsByRegion: (continent, country, region, filters = {}) =>
     api.get(
       `/spots/list/${encodeURIComponent(continent)}/${encodeURIComponent(country)}/${encodeURIComponent(region)}`,
@@ -82,6 +84,13 @@ export const sessionsAPI = {
   createSession: (sessionData) => api.post('/sessions', sessionData),
   getMySessions: () => api.get('/sessions/me'),
   getSpotSessions: (spotId) => api.get(`/sessions/${spotId}`),
+};
+
+// Favorites
+export const favoritesAPI = {
+  getMyFavorites: () => api.get('/favorites'),
+  getMyFavoriteIds: () => api.get('/favorites/ids'),
+  toggleFavorite: (spotId) => api.post(`/favorites/${spotId}`),
 };
 
 export default api;

@@ -117,6 +117,24 @@ def get_spots_by_region(
     return spots
 
 
+@router.get("/country/{continent}/{country}", response_model=List[schemas.SpotSummary])
+def get_spots_by_country(
+    continent: str,
+    country: str,
+    db: Session = Depends(get_db)
+):
+    """Récupérer tous les spots d'un pays, triés par région puis qualité."""
+    spots = db.query(models.Spot)\
+        .filter(models.Spot.continent == continent)\
+        .filter(models.Spot.country == country)\
+        .order_by(
+            models.Spot.region,
+            models.Spot.wave_quality_score.desc().nullslast()
+        )\
+        .all()
+    return spots
+
+
 @router.get("/{spot_id}", response_model=schemas.SpotResponse)
 def get_spot_detail(spot_id: int, db: Session = Depends(get_db)):
     """Récupérer les détails d'un spot."""

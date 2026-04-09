@@ -91,6 +91,8 @@ class RegionResponse(BaseModel):
 class SpotSummary(BaseModel):
     id: int
     name: Optional[str] = None
+    continent: Optional[str] = None
+    country: Optional[str] = None
     region: str
     rating: Optional[int] = None
     wave_quality: Optional[str] = None

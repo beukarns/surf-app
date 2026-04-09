@@ -114,17 +114,23 @@ function Spots() {
 
   return (
     <div className="container">
-      <div className="card">
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
         <button
           onClick={() => navigate(`/regions/${encodeURIComponent(continent)}/${encodeURIComponent(country)}`)}
-          className="back-button"
+          className="btn-ghost"
         >
-          ← Retour aux régions
+          ← Retour
         </button>
+        <span style={{ color: 'white', fontWeight: 600, fontSize: '16px' }}>
+          {continent} › {country} › {region}
+        </span>
+      </div>
 
-        <h1>Spots — {region}</h1>
-        <p style={{ color: '#666', marginBottom: '20px', fontSize: '14px' }}>
+      <div className="card">
+        <h1 style={{ marginTop: 0, marginBottom: '4px' }}>{region}</h1>
+        <p style={{ color: '#8a9bb0', fontSize: '14px', marginBottom: '24px', marginTop: 0 }}>
           {spots.length} spot{spots.length > 1 ? 's' : ''} dans cette région
+          {filteredSpots.length !== spots.length && ` • ${filteredSpots.length} affiché${filteredSpots.length > 1 ? 's' : ''}`}
         </p>
 
         {error && <div className="error">{error}</div>}
@@ -139,27 +145,30 @@ function Spots() {
 
         {/* Barre de filtres */}
         <div style={{
-          background: '#f9fafb',
-          border: '1px solid #e5e7eb',
-          borderRadius: '10px',
+          background: '#f0f6fc',
+          border: '1px solid #d6e8f5',
+          borderRadius: '12px',
           padding: '16px',
-          marginBottom: '20px',
+          marginBottom: '16px',
           display: 'flex',
-          gap: '12px',
+          gap: '10px',
           flexWrap: 'wrap',
           alignItems: 'center'
         }}>
           <input
             type="text"
-            placeholder="Rechercher dans la région..."
+            placeholder="🔍 Rechercher dans la région..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
               flex: '1 1 200px',
-              padding: '8px 12px',
-              borderRadius: '6px',
-              border: '1px solid #d1d5db',
-              fontSize: '14px'
+              padding: '9px 14px',
+              borderRadius: '8px',
+              border: '1.5px solid #c8dff0',
+              fontSize: '14px',
+              background: 'white',
+              color: '#0e4d6e',
+              outline: 'none'
             }}
           />
 
@@ -167,11 +176,12 @@ function Spots() {
             value={levelFilter}
             onChange={(e) => setLevelFilter(e.target.value)}
             style={{
-              padding: '8px 12px',
-              borderRadius: '6px',
-              border: '1px solid #d1d5db',
+              padding: '9px 14px',
+              borderRadius: '8px',
+              border: '1.5px solid #c8dff0',
               fontSize: '14px',
               background: 'white',
+              color: '#0e4d6e',
               cursor: 'pointer'
             }}
           >
@@ -186,11 +196,12 @@ function Spots() {
               value={qualityFilter}
               onChange={(e) => setQualityFilter(e.target.value)}
               style={{
-                padding: '8px 12px',
-                borderRadius: '6px',
-                border: '1px solid #d1d5db',
+                padding: '9px 14px',
+                borderRadius: '8px',
+                border: '1.5px solid #c8dff0',
                 fontSize: '14px',
                 background: 'white',
+                color: '#0e4d6e',
                 cursor: 'pointer'
               }}
             >
@@ -204,17 +215,8 @@ function Spots() {
           {(searchQuery || levelFilter || qualityFilter) && (
             <button
               onClick={() => { setSearchQuery(''); setLevelFilter(''); setQualityFilter(''); }}
-              style={{
-                padding: '8px 14px',
-                background: '#ef4444',
-                color: 'white',
-                border: 'none',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontSize: '13px',
-                fontWeight: 'bold',
-                width: 'auto'
-              }}
+              className="btn-danger"
+              style={{ fontSize: '13px', padding: '9px 14px' }}
             >
               Effacer
             </button>
@@ -223,20 +225,7 @@ function Spots() {
 
         {/* Bouton proposition */}
         <div style={{ marginBottom: '20px' }}>
-          <button
-            onClick={() => setShowForm(!showForm)}
-            style={{
-              padding: '12px 24px',
-              background: '#3b82f6',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontSize: '16px',
-              fontWeight: 'bold',
-              width: '100%'
-            }}
-          >
+          <button onClick={() => setShowForm(!showForm)} className="btn-secondary" style={{ width: '100%' }}>
             {showForm ? '✕ Annuler' : '+ Proposer un nouveau spot'}
           </button>
         </div>
@@ -244,30 +233,30 @@ function Spots() {
         {/* Formulaire de proposition */}
         {showForm && (
           <div style={{
-            background: '#f9fafb',
-            padding: '20px',
-            borderRadius: '12px',
-            marginBottom: '30px',
-            border: '2px solid #e5e7eb'
+            background: '#f0f6fc',
+            padding: '24px',
+            borderRadius: '16px',
+            marginBottom: '24px',
+            border: '1.5px solid #d6e8f5'
           }}>
-            <h3 style={{ marginTop: 0, marginBottom: '20px' }}>Proposer un nouveau spot</h3>
+            <h3 style={{ marginTop: 0, marginBottom: '20px', color: '#0e4d6e' }}>Proposer un nouveau spot</h3>
 
             {formSuccess && (
               <div style={{
-                padding: '12px',
+                padding: '12px 16px',
                 background: '#d1fae5',
                 color: '#065f46',
-                borderRadius: '8px',
-                marginBottom: '15px',
-                fontWeight: 'bold'
+                borderRadius: '10px',
+                marginBottom: '16px',
+                fontWeight: 600
               }}>
                 ✓ Votre proposition a été soumise avec succès !
               </div>
             )}
 
             <form onSubmit={handleSubmitProposal}>
-              <div style={{ marginBottom: '15px' }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+              <div style={{ marginBottom: '14px' }}>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600, color: '#0e4d6e', fontSize: '14px' }}>
                   Nom du spot *
                 </label>
                 <input
@@ -276,13 +265,13 @@ function Spots() {
                   value={formData.name}
                   onChange={handleFormChange}
                   required
-                  style={{ padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '14px' }}
+                  style={{ padding: '10px 14px', borderRadius: '8px', border: '1.5px solid #c8dff0', fontSize: '14px', width: '100%' }}
                 />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Latitude</label>
+                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600, color: '#0e4d6e', fontSize: '14px' }}>Latitude</label>
                   <input
                     type="number"
                     step="0.000001"
@@ -290,11 +279,11 @@ function Spots() {
                     value={formData.latitude}
                     onChange={handleFormChange}
                     placeholder="Ex: 46.123456"
-                    style={{ padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '14px' }}
+                    style={{ padding: '10px 14px', borderRadius: '8px', border: '1.5px solid #c8dff0', fontSize: '14px', width: '100%' }}
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Longitude</label>
+                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600, color: '#0e4d6e', fontSize: '14px' }}>Longitude</label>
                   <input
                     type="number"
                     step="0.000001"
@@ -302,60 +291,47 @@ function Spots() {
                     value={formData.longitude}
                     onChange={handleFormChange}
                     placeholder="Ex: -2.123456"
-                    style={{ padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '14px' }}
+                    style={{ padding: '10px 14px', borderRadius: '8px', border: '1.5px solid #c8dff0', fontSize: '14px', width: '100%' }}
                   />
                 </div>
               </div>
 
-              <div style={{ marginBottom: '15px' }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Description</label>
+              <div style={{ marginBottom: '14px' }}>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600, color: '#0e4d6e', fontSize: '14px' }}>Description</label>
                 <textarea
                   name="description"
                   value={formData.description}
                   onChange={handleFormChange}
                   rows="3"
                   placeholder="Décrivez le spot, son accès, les conditions..."
-                  style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '14px', resize: 'vertical' }}
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1.5px solid #c8dff0', fontSize: '14px', resize: 'vertical' }}
                 />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '20px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '20px' }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Votre nom</label>
+                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600, color: '#0e4d6e', fontSize: '14px' }}>Votre nom</label>
                   <input
                     type="text"
                     name="submitter_name"
                     value={formData.submitter_name}
                     onChange={handleFormChange}
-                    style={{ padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '14px' }}
+                    style={{ padding: '10px 14px', borderRadius: '8px', border: '1.5px solid #c8dff0', fontSize: '14px', width: '100%' }}
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Votre email</label>
+                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600, color: '#0e4d6e', fontSize: '14px' }}>Votre email</label>
                   <input
                     type="email"
                     name="submitter_email"
                     value={formData.submitter_email}
                     onChange={handleFormChange}
-                    style={{ padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '14px' }}
+                    style={{ padding: '10px 14px', borderRadius: '8px', border: '1.5px solid #c8dff0', fontSize: '14px', width: '100%' }}
                   />
                 </div>
               </div>
 
-              <button
-                type="submit"
-                style={{
-                  padding: '12px 24px',
-                  background: '#10b981',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontSize: '16px',
-                  fontWeight: 'bold',
-                  width: '100%'
-                }}
-              >
+              <button type="submit" className="btn-primary" style={{ width: '100%' }}>
                 Soumettre la proposition
               </button>
             </form>
@@ -364,11 +340,14 @@ function Spots() {
 
         {/* Liste des spots filtrés */}
         {filteredSpots.length === 0 && !loading ? (
-          <p style={{ textAlign: 'center', color: '#666', padding: '20px' }}>
-            {spots.length === 0
-              ? 'Aucun spot dans cette région'
-              : 'Aucun spot ne correspond aux filtres sélectionnés'}
-          </p>
+          <div style={{ textAlign: 'center', padding: '40px', color: '#8a9bb0' }}>
+            <div style={{ fontSize: '40px', marginBottom: '12px' }}>🌊</div>
+            <p style={{ margin: 0 }}>
+              {spots.length === 0
+                ? 'Aucun spot dans cette région'
+                : 'Aucun spot ne correspond aux filtres sélectionnés'}
+            </p>
+          </div>
         ) : (
           <ul className="list">
             {filteredSpots.map((spot) => {
@@ -382,19 +361,19 @@ function Spots() {
                   className="list-item"
                   onClick={() => navigate(`/spot/${spot.id}`)}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ flex: 1 }}>
-                      <strong>{spot.name || spot.region}</strong>
-                      <div style={{ fontSize: '13px', color: '#666', marginTop: '4px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <strong style={{ color: '#0e4d6e' }}>{spot.name || spot.region}</strong>
+                      <div style={{ fontSize: '13px', color: '#8a9bb0', marginTop: '4px' }}>
                         {[spot.type, spot.wave_quality].filter(Boolean).join(' • ')}
                       </div>
                       {(spot.swell_min || spot.swell_max) && (
-                        <div style={{ fontSize: '12px', color: '#888', marginTop: '2px' }}>
+                        <div style={{ fontSize: '12px', color: '#a0b3c6', marginTop: '2px' }}>
                           Houle: {spot.swell_min || '?'}m – {spot.swell_max || '?'}m
                         </div>
                       )}
                     </div>
-                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end', flexShrink: 0 }}>
                       {level && (
                         <span style={{
                           background: levelColor,
@@ -402,7 +381,7 @@ function Spots() {
                           padding: '3px 10px',
                           borderRadius: '20px',
                           fontSize: '11px',
-                          fontWeight: 'bold'
+                          fontWeight: 700
                         }}>
                           {level}
                         </span>
@@ -414,7 +393,7 @@ function Spots() {
                           padding: '3px 10px',
                           borderRadius: '20px',
                           fontSize: '11px',
-                          fontWeight: 'bold'
+                          fontWeight: 700
                         }}>
                           {spot.wave_quality}
                         </span>
